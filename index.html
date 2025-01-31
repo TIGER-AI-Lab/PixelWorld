@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="PixelWorld: Towards Perceiving Everything as Pixels">
+    <meta property="og:title" content="PixelWorld: Towards Perceiving Everything as Pixels" />
+    <meta property="og:description" content="We propose to perceive everything as pixles for unified perception" />
+    <meta property="og:url" content="https://github.com/TIGER-AI-Lab/PixelWorld" />
+    <meta property="og:image" content="" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <title>Critique Fine-Tuning</title>
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="static/css/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+
+<body>
+    <section class="hero">
+        <div class="hero-body">
+            <div class="container is-max-desktop">
+                <div class="columns is-centered">
+                    <div class="column has-text-centered">
+                        <h1 class="title is-1 publication-title">
+                            PixelWorld: Towards Perceiving Everything as Pixels
+                        </h1>
+                        <div class="is-size-5 publication-authors">
+                            <span class="author-block">
+                                Zhiheng Lyu,
+                            </span>
+                            <span class="author-block">
+                                Xueguang Ma,
+                            </span>
+                            <span class="author-block">
+                                Wenhu Chen
+                            </span>
+                        </div>
+
+                        <div class="column has-text-centered">
+                            <div class="publication-links">
+                                <!-- GitHub link -->
+                                <span class="link-block">
+                                    <a href="https://github.com/TIGER-AI-Lab/PixelWorld" target="_blank"
+                                    class="external-link button is-normal is-rounded is-dark">
+                                    <span class="icon">
+                                        <i class="fab fa-github"></i>
+                                    </span>
+                                    <span>Code</span>
+                                    </a>
+                                </span>
+
+                                <!-- Paper link (placeholder) -->
+                                <span class="link-block">
+                                    <a href="#" target="_blank"
+                                    class="external-link button is-normal is-rounded is-dark">
+                                    <span class="icon">
+                                        <i class="ai ai-arxiv"></i>
+                                    </span>
+                                    <span>Paper</span>
+                                    </a>
+                                </span>
+
+                                <span class="link-block">
+                                  <a href="#" target="_blank"
+                                  class="external-link button is-normal is-rounded is-dark">
+                                      <span class="icon">
+                                        🤗
+                                      </span>
+                                      <span>PixelWorld Dataset</span>
+                                  </a>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="is-size-5 publication-authors">
+                            <span class="author-block">
+                            University of Waterloo, Vector Institute
+                            </span>
+                            <br>
+                            <span class="author-block">
+                                <small>
+                                    zhiheng.lyu@uwaterloo.ca,
+                                    wenhuchen@uwaterloo.ca
+                                </small>
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section hero is-light">
+        <div class="container is-max-desktop">
+            <div class="columns is-centered has-text-centered">
+                <div class="column is-four-fifths">
+                    <h1 class="title is-3">Abstract</h1>
+                    <div class="content has-text-justified">
+                        <p>
+                            Existing foundation models typically process visual input as pixels and textual input as tokens, a paradigm that contrasts with human perception, where both modalities are processed in a unified manner. With the rise of embodied and agentic AI, where inputs primarily come from camera pixels, the need for a unified perception framework becomes increasingly evident. In this paper, we propose to unify all modalities (text, tables, code, diagrams, images, etc) as pixel inputs, i.e. “Perceive Everything as Pixels” (PEAP). We introduce PixelWorld, a novel evaluation suite that unifies all the mentioned modalities into pixel space to gauge the existing models' performance. Our findings show that (1) PixelWorld outperforms baseline with token-based input in multimodal datasets, benefiting from unified input for better disambiguation, (2) significant declines in reasoning and coding capabilities across all models when processing pixel-based input, underscoring the need to enhance foundation models' perceptual abilities, (3) larger models can maintain strong performance on non-reasoning tasks under PEAP, while smaller models like Phi-3.5-V suffer significant performance degradation, (4) the attention pattern of PEAP is highly aligned with text token input, (5) PEAP can be accelerated significantly by exploiting the spatial sparsity. We conclude that the existing frontier models are competent in pixel perception, however, there is still headroom for improvement.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BibTeX citation -->
+    <section class="section" id="BibTeX">
+        <div class="container is-max-desktop content">
+            <h2 class="title">Reference</h2>
+            Please kindly cite our paper if you use our code or results:
+            <pre><code>@article{lyu2024pixelworld,
+    title={PixelWorld: Towards Perceiving Everything as Pixels},
+    author={Lyu, Zhiheng and Ma, Xueguang and Chen, Wenhu},
+    journal={},
+    year={2025}
+}</code></pre>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-8">
+                    <div class="content has-text-centered">
+                        <p>
+                            This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
