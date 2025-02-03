@@ -1,5 +1,5 @@
 # PixelWorld
-The official code of our paper [PixelWorld: Towards Perceiving Everything as Pixels](https://huggingface.co/datasets/TIGER-Lab/PixelWorld).
+The official code of our paper [PixelWorld: Towards Perceiving Everything as Pixels](https://arxiv.org/abs/2501.19339).
 
 Refactoring... There may be some problems with the reference relationship between codes.
 
