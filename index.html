@@ -109,24 +109,125 @@
         </div>
     </section>
 
-    <section class="hero">
-        <div class="hero-body">
-            <div class="container is-max-desktop">
-                <div class="columns is-centered">
-                    <div class="column is-full">
-                        <div class="item">
-                            <!-- Your image here -->
-                            <img src="static/images/head_figure.jpg" alt="CFT" />
-                            <h2 class="subtitle">
-                                Figure 1: PEAP framework: we investigate the possibility of perceive everything as pixels. This framework aligns better with human perception reducing the need for excessive pre-processing.   Evaluated on our benchmark \textsc{PixelWorld}, \method boosts performance on multimodal tasks (e.g., websites, slides, documents) but struggles with complex, text-centric tasks (e.g., reasoning and coding). Larger models achieve better transferability between pixel- and token-based performance compared to smaller ones. We also observed that text and images exhibit similar attention patterns, and reduced the overhead of model reasoning through patch pruning by \method-Fast.
-                            </h2>
-                        </div>
-                    </div>
-                </div>
+    <section class="section hero is-light" id="MethodOverview">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered">
+            <div class="column is-10">
+              <h1 class="title is-3">Method Overview: Perceive Everything as Pixels (PEAP)</h1>
+              <div class="content">
+                <p>
+                  We propose to unify all modalities (text, tables, code, diagrams, images, etc.) as pixel inputs. This approach, called <strong>PEAP</strong>, is designed to better align with human perception and reduce the need for excessive pre-processing.
+                </p>
+                <p>
+                  The diagram below (corresponding to <strong>Figure 1</strong> in the paper) illustrates the overall PEAP framework.
+                </p>
+              </div>
             </div>
+          </div>
+          <div class="columns is-centered">
+            <div class="column is-8 has-text-centered">
+              <figure class="image">
+                <img src="static/images/head_figure.jpg" alt="PEAP Overview Diagram">
+              </figure>
+              <p class="subtitle is-5">
+                Figure 1: PEAP framework: we investigate the possibility of perceive everything as pixels. This framework aligns better with human perception reducing the need for excessive pre-processing.   Evaluated on our benchmark \textsc{PixelWorld}, \method boosts performance on multimodal tasks (e.g., websites, slides, documents) but struggles with complex, text-centric tasks (e.g., reasoning and coding). Larger models achieve better transferability between pixel- and token-based performance compared to smaller ones. We also observed that text and images exhibit similar attention patterns, and reduced the overhead of model reasoning through patch pruning by \method-Fast.
+              </p>
+            </div>
+          </div>
         </div>
-    </section>
+      </section>
+      
+      <section class="section" id="EvaluationResults">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered">
+            <div class="column is-10">
+              <h1 class="title is-3">Evaluation Results</h1>
+              <div class="content">
+                <p>
+                  We comprehensively evaluated PEAP on text-only, structured, and multimodal tasks. The key findings include:
+                </p>
+                <ul>
+                  <li>PEAP outperforms token-based baselines on multimodal tasks by providing better disambiguation.</li>
+                  <li>Significant performance degradation is observed in complex reasoning and coding tasks when processing pixel-based inputs.</li>
+                  <li>Larger models can maintain strong performance under PEAP, whereas smaller models face more challenges.</li>
+                  <!-- <li>The attention patterns of PEAP closely align with those of token-based inputs.</li>
+                  <li>The proposed <strong>PEAP-Fast</strong> method significantly accelerates inference by exploiting spatial sparsity.</li> -->
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="columns is-centered">
+            <div class="column is-8 has-text-centered">
+              <figure class="image">
+                <img src="static/images/plt_decompose.png" alt="Evaluation Results (Text-only)">
+              </figure>
+              <figure class="image">
+                <img src="static/images/plt_decompose_sc32.png" alt="Evaluation Results (Structural)">
+              </figure>
+              <figure class="image">
+                <img src="static/images/plt_decompose_sc33.png" alt="Evaluation Results (Multimodal)">
+              </figure>
+              <p class="subtitle is-5">
+                Figure 2, 3, 5: Performance Comparison
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
+      <section class="section hero is-light" id="AttentionVisualization">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered">
+            <div class="column is-10">
+              <h1 class="title is-3">Attention Visualization</h1>
+              <div class="content">
+                <p>
+                  To gain insight into how the model processes pixel inputs, we visualized the attention maps of Qwen2VL-7B’s final layer for both token-based and pixel-based inference. The results, shown below (corresponding to <strong>Figure 3</strong> in the paper), reveal that the attention distribution is largely consistent across modalities.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="columns is-centered">
+            <div class="column is-8 has-text-centered">
+              <figure class="image">
+                <img src="static/images/attention_heatmap.jpg" alt="Attention Heatmap">
+              </figure>
+              <p class="subtitle is-5">
+                Figure 6: Attention Heatmap Comparison
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="EfficiencyImprovements">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered">
+            <div class="column is-10">
+              <h1 class="title is-3">Efficiency Improvements with PEAP-Fast</h1>
+              <div class="content">
+                <p>
+                  Pixel-based input usually incurs higher computational overhead due to redundant blank patches. To mitigate this, we introduce <strong>PEAP-Fast</strong>, a sparsification algorithm that prunes non-informative regions, thereby reducing inference latency significantly while preserving model accuracy.
+                </p>
+                <p>
+                  The figure below (corresponding to <strong>Table 2</strong> and related figures in the paper) illustrates the efficiency gains achieved by PEAP-Fast.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="columns is-centered">
+            <div class="column is-8 has-text-centered">
+              <figure class="image">
+                <img src="static/images/heatmap_sparse.jpg" alt="Efficiency Improvements">
+              </figure>
+              <p class="subtitle is-5">
+                Figure 9: Efficiency Improvements with PEAP-Fast
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
 
     <!-- BibTeX citation -->
     <section class="section" id="BibTeX">
