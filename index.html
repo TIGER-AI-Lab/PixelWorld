@@ -109,7 +109,7 @@
         </div>
     </section>
 
-    <section class="section hero is-light" id="MethodOverview">
+    <section class="section" id="MethodOverview">
         <div class="container is-max-desktop">
           <div class="columns is-centered">
             <div class="column is-10">
@@ -128,15 +128,61 @@
             <div class="column is-8 has-text-centered">
               <figure class="image">
                 <img src="static/images/head_figure.jpg" alt="PEAP Overview Diagram">
+                <figcaption>
+                    <strong>Figure 1:</strong> PEAP framework: we investigate the possibility of perceiving everything as pixels. This framework aligns better with human perception, reducing the need for excessive pre-processing. Evaluated on our benchmark <em>PixelWorld</em>, PEAP boosts performance on multimodal tasks (e.g., websites, slides, documents) but struggles with complex, text-centric tasks (e.g., reasoning and coding). Larger models achieve better transferability between pixel- and token-based performance compared to smaller ones. We also observed that text and images exhibit similar attention patterns and reduced the overhead of model reasoning through patch pruning by PEAP-Fast.
+                </figcaption>
+              </figure>
+              <!-- <p class="subtitle is-5">
+                Figure 1: PEAP framework: we investigate the possibility of perceive everything as pixels. This framework aligns better with human perception reducing the need for excessive pre-processing.   Evaluated on our benchmark \textsc{PixelWorld}, \method boosts performance on multimodal tasks (e.g., websites, slides, documents) but struggles with complex, text-centric tasks (e.g., reasoning and coding). Larger models achieve better transferability between pixel- and token-based performance compared to smaller ones. We also observed that text and images exhibit similar attention patterns, and reduced the overhead of model reasoning through patch pruning by \method-Fast.
+              </p> -->
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section class="section hero is-light" id="DatasetSection">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered">
+            <div class="column is-10">
+              <h1 class="title is-3">Dataset</h1>
+              <div class="content">
+                <p>
+                  We construct a comprehensive evaluation suite to systematically analyze and compare VLMs’ performance across text-only, structured, and multimodal inputs. <strong>Table 1</strong> below (adapted from the original paper) summarizes the key datasets with their sizes, tasks, and modality transfer methods. These include established benchmarks such as GLUE, SuperGLUE, and MMLU-Pro for text-only tasks, TableBench for structured data, and MathVerse or SlidesVQA for inherently multimodal scenarios.
+                </p>
+                <p>
+                  To create pixel-based input for text-only and structured data, we employ an image synthesis pipeline, which renders plain text or tabular data into images of varying size and font style. <strong>Figure 2</strong> (also from the original paper) illustrates an example of how an input prompt is transformed into a visually rendered image for model inference. This approach ensures that layout information is preserved, reducing potential OCR errors and aligning more closely with our “Perceive Everything as Pixels” (PEAP) paradigm.
+                </p>
+              </div>
+            </div>
+          </div>
+      
+          <!-- Figure 1: Dataset Composition Table -->
+          <div class="columns is-centered">
+            <div class="column is-8 has-text-centered">
+              <figure class="image">
+                <img src="static/images/table1.jpg" alt="Dataset Composition Overview">
               </figure>
               <p class="subtitle is-5">
-                Figure 1: PEAP framework: we investigate the possibility of perceive everything as pixels. This framework aligns better with human perception reducing the need for excessive pre-processing.   Evaluated on our benchmark \textsc{PixelWorld}, \method boosts performance on multimodal tasks (e.g., websites, slides, documents) but struggles with complex, text-centric tasks (e.g., reasoning and coding). Larger models achieve better transferability between pixel- and token-based performance compared to smaller ones. We also observed that text and images exhibit similar attention patterns, and reduced the overhead of model reasoning through patch pruning by \method-Fast.
+                Table 1: Dataset Composition Overview
+              </p>
+            </div>
+          </div>
+      
+          <!-- Figure 2: Image Synthesis Example -->
+          <div class="columns is-centered">
+            <div class="column is-8 has-text-centered">
+              <figure class="image">
+                <img src="static/images/example_input_1.png" alt="Synthesized Input Example">
+              </figure>
+              <p class="subtitle is-5">
+                Figure 2: Example of Synthesized Input
               </p>
             </div>
           </div>
         </div>
       </section>
       
+
       <section class="section" id="EvaluationResults">
         <div class="container is-max-desktop">
           <div class="columns is-centered">
@@ -158,18 +204,23 @@
           </div>
           <div class="columns is-centered">
             <div class="column is-8 has-text-centered">
-              <figure class="image">
-                <img src="static/images/plt_decompose.png" alt="Evaluation Results (Text-only)">
-              </figure>
-              <figure class="image">
-                <img src="static/images/plt_decompose_sc32.png" alt="Evaluation Results (Structural)">
-              </figure>
-              <figure class="image">
-                <img src="static/images/plt_decompose_sc33.png" alt="Evaluation Results (Multimodal)">
-              </figure>
-              <p class="subtitle is-5">
+                <figure class="image">
+                    <img src="static/images/plt_decompose.png" alt="Evaluation Results (Text-only)">
+                    <figcaption>Evaluation Results (Text-only)</figcaption>
+                  </figure>
+                  
+                  <figure class="image">
+                    <img src="static/images/plt_decompose_sc32.png" alt="Evaluation Results (Structural)">
+                    <figcaption>Evaluation Results (Structural)</figcaption>
+                  </figure>
+                  
+                  <figure class="image">
+                    <img src="static/images/plt_decompose_sc33.png" alt="Evaluation Results (Multimodal)">
+                    <figcaption>Evaluation Results (Multimodal)</figcaption>
+                  </figure>                  
+              <!-- <p class="subtitle is-5">
                 Figure 2, 3, 5: Performance Comparison
-              </p>
+              </p> -->
             </div>
           </div>
         </div>
@@ -193,7 +244,7 @@
                 <img src="static/images/attention_heatmap.jpg" alt="Attention Heatmap">
               </figure>
               <p class="subtitle is-5">
-                Figure 6: Attention Heatmap Comparison
+                <strong>Figure 3</strong>: Attention Heatmap Comparison
               </p>
             </div>
           </div>
@@ -207,22 +258,34 @@
               <h1 class="title is-3">Efficiency Improvements with PEAP-Fast</h1>
               <div class="content">
                 <p>
-                  Pixel-based input usually incurs higher computational overhead due to redundant blank patches. To mitigate this, we introduce <strong>PEAP-Fast</strong>, a sparsification algorithm that prunes non-informative regions, thereby reducing inference latency significantly while preserving model accuracy.
-                </p>
-                <p>
-                  The figure below (corresponding to <strong>Table 2</strong> and related figures in the paper) illustrates the efficiency gains achieved by PEAP-Fast.
+                  Pixel-based input usually incurs higher computational overhead due to redundant blank patches. To mitigate this, we introduce <strong>PEAP-Fast</strong>, a sparsification algorithm that prunes non-informative regions, thereby reducing inference latency significantly (Table 3) while preserving model accuracy (Table 2).
                 </p>
               </div>
             </div>
           </div>
           <div class="columns is-centered">
             <div class="column is-8 has-text-centered">
+                <figure class="image">
+                  <img src="static/images/table_pref.jpg" alt="Efficiency Improvements">
+                  <figcaption>
+                    <strong>Table 2:</strong> Impact of PEAP-Fast on Model Accuracy in SuperGLUE subsets.
+                </figcaption>
+                </figure>
+                <figure class="image">
+                  <img src="static/images/table_speed.jpg" alt="Efficiency Improvements">
+                  <figcaption>
+                    <strong>Table 3:</strong> Reduction in Inference Latency with PEAP-Fast.
+                </figcaption>
+                </figure>
               <figure class="image">
                 <img src="static/images/heatmap_sparse.jpg" alt="Efficiency Improvements">
+                <figcaption>
+                    <strong>Figure 4:</strong> Efficiency Improvements with PEAP-Fast on the Heatmap.
+                </figcaption>
               </figure>
-              <p class="subtitle is-5">
+              <!-- <p class="subtitle is-5">
                 Figure 9: Efficiency Improvements with PEAP-Fast
-              </p>
+              </p> -->
             </div>
           </div>
         </div>
