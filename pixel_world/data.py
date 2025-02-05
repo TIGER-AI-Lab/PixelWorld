@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import time
 import shutil
@@ -22,7 +23,7 @@ from image_generate import ImageGenerator
 class DatasetWarperBase(ABC):
     REQUIRED_VARS = ["name", "huggingface_name", "tasks", "image_generator"]
 
-    def __init__(self, cot_flag=True, mode='text', init_data = True):
+    def __init__(self, cot_flag=True, mode='text', init_data = True, from_hf = False):
         super().__init__()
         self.cot_flag = cot_flag
         if self.cot_flag:
@@ -40,6 +41,9 @@ class DatasetWarperBase(ABC):
             )
         self.mode = mode
         self.init_data = init_data
+        if from_hf:
+            self.PureTextData = self.PureTextData_hf
+            self.VisionData = self.VisionDataData_hf
         if init_data:
             if mode == 'text':
                 self.data_dict = self.PureTextData()
@@ -73,6 +77,93 @@ class DatasetWarperBase(ABC):
         query_text_template = "Please answer the question in the image."
         DatasetList = self.PureTextData()
         data_dict = self.image_generator.construct_image_dataset(self.name, DatasetList, query_text_template, cot_flag=self.cot_flag)
+        return data_dict
+
+    def PureTextData_hf(self):
+        """
+        Load the TIGER-Lab/PixelWorld dataset and return
+        a dict keyed by Subset, with values as list of [Text_Prompt, Answer].
+        """
+        hf_path = "TIGER-Lab/PixelWorld"
+        dataset = load_dataset(hf_path, split="train", trust_remote_code=True)
+        dataset = dataset.filter(lambda x: x["Dataset"] == self.name + "Dataset")
+        data_dict = {}
+        total_count = 0
+
+        for sample in tqdm(dataset):
+            subset = sample["Subset"]
+            text_prompt = sample["Text_Prompt"]
+            answer = sample["Answer"]
+
+            if subset not in data_dict:
+                data_dict[subset] = []
+
+            data_dict[subset].append([text_prompt, answer])
+            total_count += 1
+
+        print(f"Total examples: {total_count}")
+        return data_dict
+
+    def VisionDataData_hf(self):
+        """
+        Load the TIGER-Lab/PixelWorld dataset and return
+        a dict keyed by Subset, with values as a list of [Vision Prompt, local_path(s), Answer].
+
+        Special rule:
+        - If self.name is NOT in ["WikiSS_QA", "SlidesVQA"], only use the FIRST image path.
+        - Otherwise, use all image paths.
+
+        Also ensure the image(s) is saved locally under 'data/' + img_path if not already.
+        """
+        hf_path = "TIGER-Lab/PixelWorld"
+        dataset = load_dataset(hf_path, split="train", trust_remote_code=True)
+        # 根据 Dataset 名进行过滤
+        dataset = dataset.filter(lambda x: x["Dataset"] == self.name + "Dataset")
+
+        data_dict = {}
+        total_count = 0
+
+        for sample in tqdm(dataset):
+            subset = sample["Subset"]
+            img_prompt = sample["Img_Prompt"]
+            answer = sample["Answer"]
+
+            # 如果这个 subset 还没出现过，就初始化
+            if subset not in data_dict:
+                data_dict[subset] = []
+
+            # 如果不是 WikiSS_QA 或 SlidesVQA，只用第一个图像
+            if self.name not in ["WikiSS_QA", "SlidesVQA"]:
+                # 只取第一个路径 + 图像对象
+                first_path = sample["Image_Pathes"][0]
+                first_img_obj = sample["Images"][0]
+
+                local_path = os.path.join("data", first_path)
+                os.makedirs(os.path.dirname(local_path), exist_ok=True)
+                if not os.path.exists(local_path):
+                    first_img_obj.save(local_path)
+
+                # 这里存的仅是一个字符串
+                data_dict[subset].append([img_prompt, local_path, answer])
+
+            else:
+                # 使用所有图像路径
+                local_paths = []
+                for path, img_obj in zip(sample["Image_Pathes"], sample["Images"]):
+                    local_path = os.path.join("data", path)
+                    os.makedirs(os.path.dirname(local_path), exist_ok=True)
+
+                    if not os.path.exists(local_path):
+                        img_obj.save(local_path)
+
+                    local_paths.append(local_path)
+
+                # 这里存的是一个由多个路径组成的列表
+                data_dict[subset].append([img_prompt, local_paths, answer])
+
+            total_count += 1
+
+        print(f"Total examples: {total_count}")
         return data_dict
 
     @abstractmethod
@@ -212,8 +303,8 @@ class SuperGLUEDataset(DatasetWarperBase):
     tasks = ["boolq", "cb", "copa", "multirc", "record", "rte", "wic", "wsc"]
     image_generator = ImageGenerator()
 
-    def __init__(self, cot_flag=True, mode='text', init_data = True):
-        super(SuperGLUEDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data)
+    def __init__(self, cot_flag=True, mode='text', init_data = True, from_hf = False):
+        super(SuperGLUEDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data, from_hf=from_hf)
 
     def format_prompt(self, task, sample):
         """
@@ -509,12 +600,12 @@ class GLUEDataset(DatasetWarperBase):
     ]
     image_generator = ImageGenerator()  # kept for consistency with the original structure
 
-    def __init__(self, cot_flag=True, mode='text', init_data = True):
+    def __init__(self, cot_flag=True, mode='text', init_data = True, from_hf = False):
         """
         :param cot_flag: Whether to include chain-of-thought reasoning in the prompt
         :param mode: 'text' or other mode of data representation
         """
-        super(GLUEDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data)
+        super(GLUEDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data, from_hf=from_hf)
 
     def format_prompt(self, task, sample):
         """
@@ -963,8 +1054,8 @@ class MMLUDataset(DatasetWarperBase):
     tasks = list(subcategories.keys())
     image_generator = ImageGenerator()
 
-    def __init__(self, cot_flag=True, mode='text', init_data = True):
-        super(MMLUDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data)
+    def __init__(self, cot_flag=True, mode='text', init_data = True, from_hf = False):
+        super(MMLUDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data, from_hf=from_hf)
 
     def format_prompt(self, task, sample):
         """
@@ -1057,8 +1148,8 @@ class MMLUProDataset(DatasetWarperBase):
     tasks = ['health', 'history', 'chemistry', 'computer science', 'biology', 'engineering', 'other', 'economics', 'math', 'psychology', 'philosophy', 'business', 'law', 'physics']
     image_generator = ImageGenerator()
 
-    def __init__(self, cot_flag=True, mode='text', init_data = True):
-        super(MMLUProDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data)
+    def __init__(self, cot_flag=True, mode='text', init_data = True, from_hf = False):
+        super(MMLUProDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data, from_hf=from_hf)
 
     def format_prompt(self, task, sample):
         """
@@ -1159,8 +1250,8 @@ class GSM8KDataset(DatasetWarperBase):
     tasks = ["main"]
     image_generator = ImageGenerator()
 
-    def __init__(self, cot_flag=True, mode='text', init_data = True):
-        super(GSM8KDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data)
+    def __init__(self, cot_flag=True, mode='text', init_data = True, from_hf = False):
+        super(GSM8KDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data, from_hf=from_hf)
 
     def format_prompt(self, task, sample):
         """
@@ -1247,8 +1338,8 @@ class MBPPDataset(DatasetWarperBase):
     tasks = ['full', 'sanitized']
     image_generator = ImageGenerator()
 
-    def __init__(self, cot_flag=True, mode='text', init_data = True):
-        super(MBPPDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data)
+    def __init__(self, cot_flag=True, mode='text', init_data = True, from_hf = False):
+        super(MBPPDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data, from_hf=from_hf)
 
     def format_prompt(self, task, sample):
         """
@@ -1371,8 +1462,8 @@ class ARCDataset(DatasetWarperBase):
     tasks = ['ARC-Easy', 'ARC-Challenge']
     image_generator = ImageGenerator()
 
-    def __init__(self, cot_flag=True, mode='text', init_data = True):
-        super(ARCDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data)
+    def __init__(self, cot_flag=True, mode='text', init_data = True, from_hf = False):
+        super(ARCDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data, from_hf=from_hf)
 
     def format_prompt(self, task, sample):
         """
@@ -1471,8 +1562,8 @@ class TableBenchDataset(DatasetWarperBase):
     tasks = ['DataAnalysis', 'NumericalReasoning', 'Visualization', 'FactChecking']
     image_generator = ImageGenerator()
 
-    def __init__(self, cot_flag=True, mode='text', init_data = True):
-        super(TableBenchDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data)
+    def __init__(self, cot_flag=True, mode='text', init_data = True, from_hf = False):
+        super(TableBenchDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data, from_hf=from_hf)
         if self.cot_flag:
             self.base_template = (
                 "Please first reason step by step, then only provide your final answer after 'Final Answer:'.\n"
@@ -1626,9 +1717,9 @@ class WikiSS_QADataset(DatasetWarperBase):
     tasks = ['main']
     image_generator = ImageGenerator()
 
-    def __init__(self, cot_flag=True, mode='text', init_data = True):
+    def __init__(self, cot_flag=True, mode='text', init_data = True, from_hf = False):
         self.meta_data = None
-        super(WikiSS_QADataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data)
+        super(WikiSS_QADataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data, from_hf=from_hf)
 
     # The same code with SlidesVQA
     def format_prompt(self, question, answer, reference, type): # if type == "img", then reference is a img path
@@ -1824,9 +1915,9 @@ class SlidesVQADataset(DatasetWarperBase):
     tasks = ['main']
     image_generator = ImageGenerator()
 
-    def __init__(self, cot_flag=True, mode='text', init_data = True):
+    def __init__(self, cot_flag=True, mode='text', init_data = True, from_hf = False):
         self.meta_data = None
-        super(SlidesVQADataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data)
+        super(SlidesVQADataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data, from_hf=from_hf)
 
     def format_prompt(self, question, answer, references, type): # if type == "img", then reference is a img path
 
@@ -1948,9 +2039,9 @@ class MathverseDataset(DatasetWarperBase):
     tasks = ['main']
     image_generator = ImageGenerator()
 
-    def __init__(self, cot_flag=True, mode='text', init_data = True):
+    def __init__(self, cot_flag=True, mode='text', init_data = True, from_hf = False):
         self.meta_data = None
-        super(MathverseDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data)
+        super(MathverseDataset, self).__init__(cot_flag=cot_flag, mode=mode, init_data=init_data, from_hf=from_hf)
 
     def parse_output(self, task, output):
         output = output.split("Answer:")[-1].strip()
@@ -2085,6 +2176,12 @@ def main():
         help="The prompt type for text data. Options are 'base' or 'cot'."
     )
 
+    parser.add_argument(
+        '--from_hf',
+        action='store_true',
+        help="Using Local or Huggingface dataset."
+    )
+
     args = parser.parse_args()
 
     from model import load_modelObject
@@ -2096,7 +2193,7 @@ def main():
         raise ValueError(f"Dataset class '{args.dataset}' not found in the current file.")
 
     # Initialize dataset and model instances
-    dataset = dataset_class(cot_flag= args.prompt == 'cot', mode=args.mode)
+    dataset = dataset_class(cot_flag= args.prompt == 'cot', mode=args.mode, from_hf = args.from_hf)
     if args.mode == 'img':
         dataset.VisionData()
         print("Image data generated successfully.")
@@ -2134,11 +2231,11 @@ def testDataset(dataset_name = "TableBenchDataset"):
     from model import TestWrapper
     model = TestWrapper()
 
-    dataset = dataset_class(cot_flag=True, mode='text')
+    dataset = dataset_class(cot_flag=True, mode='text', from_hf = True) # test text mode
     dataset.InferenceDataset(model)
     dataset.Eval(model.name)
 
-    dataset = dataset_class(cot_flag=True, mode='img') # test img and semi mode
+    dataset = dataset_class(cot_flag=True, mode='img', from_hf = True) # test text mode
 
     # Run the inference with a timer
     start_time = time.time()
@@ -2151,9 +2248,13 @@ def testDataset(dataset_name = "TableBenchDataset"):
     dataset.Eval(model.name)
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) > 1:
+        main()
+    else:
+        testDataset("ARCDataset")
+    # main()
     # testDataset("WikiSS_QADataset")
     # testDataset("SlidesVQADataset")
     # testDataset("MMLUProDataset")
-    # testDataset("GLUEDataset")
+    # testDataset("ARCDataset")
 

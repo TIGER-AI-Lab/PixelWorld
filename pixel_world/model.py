@@ -1175,10 +1175,10 @@ def load_modelObject(model_name, input_method = "text"): # text or img
         # model = QWen2VLWrapper(model_name="Qwen2-VL-7B-Instruct", batch_size=1 if input_method == "img" else 8)
         return model
     elif model_name == "Qwen2_VL_2B":
-        model = MegaBenchModelWrapper(model_name="Qwen2-VL-2B-Instruct", model_class_name="Qwen2VL",
-                                      model_hf_name="Qwen/Qwen2-VL-2B-Instruct")
-        # model = QWen2VLWrapper(model_name="Qwen2-VL-2B-Instruct", model_path = "Qwen/Qwen2-VL-2B-Instruct",
-        #                        batch_size=1 if input_method == "img" else 1)
+        # model = MegaBenchModelWrapper(model_name="Qwen2-VL-2B-Instruct", model_class_name="Qwen2VL",
+        #                               model_hf_name="Qwen/Qwen2-VL-2B-Instruct")
+        model = QWen2VLWrapper(model_name="Qwen2-VL-2B-Instruct", model_path = "Qwen/Qwen2-VL-2B-Instruct",
+                               batch_size=1 if input_method == "img" else 1)
         return model
     elif model_name == "QVQ_72B_Preview":
         model = QWen2VLWrapper(model_name="QVQ_72B_Preview", model_path = "Qwen/QVQ-72B-Preview",  batch_size=1 if

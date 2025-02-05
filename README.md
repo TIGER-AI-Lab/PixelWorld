@@ -8,6 +8,16 @@ Refactoring... There may be some problems with the reference relationship betwee
 pip install -r requirements.txt
 ```
 
-## Project Site
+## Get Started
+### From Local Files
+```bash
+python data.py --dataset WikiSS_QADataset --model GPT4o --mode text --prompt base
+```
+### From Huggingface Dataset
+```bash
+python data.py --dataset WikiSS_QADataset --model GPT4o --mode text --prompt base --from_hf
+```
 
-Site under construction.
+## Project Site
+[PixelWorld](https://tiger-ai-lab.github.io/PixelWorld/)
+
