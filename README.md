@@ -21,3 +21,15 @@ python data.py --dataset WikiSS_QADataset --model GPT4o --mode text --prompt bas
 ## Project Site
 [PixelWorld](https://tiger-ai-lab.github.io/PixelWorld/)
 
+## Citation
+```
+@article{lyu2024pixelworld,
+    title={PixelWorld: Towards Perceiving Everything as Pixels},
+    author={Lyu, Zhiheng and Ma, Xueguang and Chen, Wenhu},
+    year={2025},
+    eprint={2501.19339},
+    archivePrefix={arXiv},
+    primaryClass={cs.CL},
+    url={http://arxiv.org/abs/2501.19339},
+}
+```
